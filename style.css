@@ -1,0 +1,271 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100vw;
+  height: 100vh;
+  background-color: #FFFFFF;
+  font-family: 'JetBrains Mono', monospace;
+  overflow: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle 1px Rounded Page Border around full viewport */
+.viewport-frame {
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  border-radius: 16px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Ambient Lavender Radial Glows Across Viewport */
+.ambient-glow-title {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70vw;
+  height: 40vh;
+  background: radial-gradient(ellipse at center, rgba(167, 139, 250, 0.09) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow-upload {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80vw;
+  height: 45vh;
+  background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.06) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Full Viewport Decorative SVG Layer (Topography, Blueprint Lines, Dot Grids, Glowing Nodes) */
+.viewport-decorations {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Main Full-Screen Layout Container */
+.app-layout {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 20vh; /* Title sit around 18-22% from top of viewport */
+  position: relative;
+  z-index: 2;
+}
+
+/* Title Section */
+.title-section {
+  padding: 0;
+  margin-bottom: 96px;
+  text-align: center;
+}
+
+.title-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 64px;
+  color: #111111;
+  letter-spacing: -1.2px;
+  line-height: 1.08;
+  user-select: none;
+  text-shadow: 0 0 35px rgba(167, 139, 250, 0.14), 0 2px 10px rgba(17, 17, 17, 0.03);
+}
+
+/* Upload Area (~35-45% of Viewport Width) */
+.drop-zone-container {
+  width: 42vw;
+  min-width: 480px;
+  max-width: 680px;
+  height: 185px;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 0 35px rgba(167, 139, 250, 0.07), 0 4px 20px rgba(0, 0, 0, 0.015);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.drop-zone-container:hover {
+  box-shadow: 0 0 45px rgba(167, 139, 250, 0.14), 0 6px 24px rgba(0, 0, 0, 0.025);
+  transform: translateY(-1px);
+}
+
+/* Thinner dashed border with soft lavender tint (#A78BFA) */
+.drop-zone-border {
+  position: absolute;
+  inset: 0;
+  border: 1px dashed rgba(167, 139, 250, 0.55);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.drop-zone-container:hover .drop-zone-border {
+  border-color: #8B5CF6;
+  background-color: rgba(245, 243, 255, 0.4);
+}
+
+.drop-zone-container.drag-active .drop-zone-border {
+  border-color: #8B5CF6;
+  background-color: rgba(238, 234, 254, 0.6);
+  border-style: solid;
+}
+
+/* Default Content State inside Drop Box */
+.drop-zone-default {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Upload Icon Circle */
+.icon-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(17, 17, 17, 0.75);
+  color: #111111;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(167, 139, 250, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.drop-zone-container:hover .icon-circle {
+  transform: scale(1.04);
+}
+
+.primary-msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #111111;
+  margin-bottom: 6px;
+  letter-spacing: -0.2px;
+}
+
+.secondary-msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #6B7280;
+  letter-spacing: -0.1px;
+}
+
+/* File Selected View */
+.file-selected-view {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 28px;
+  background: #F9FAFB;
+  border-radius: 12px;
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  box-shadow: 0 4px 12px rgba(167, 139, 250, 0.08);
+}
+
+.selected-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.file-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #111111;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-size {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #6B7280;
+  margin-top: 2px;
+}
+
+.reset-btn {
+  background: #FFFFFF;
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  color: #111111;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+  background: #F3E8FF;
+  border-color: #8B5CF6;
+  color: #8B5CF6;
+}
+
+@media (max-width: 768px) {
+  .app-layout {
+    padding-top: 14vh;
+  }
+
+  .title-section {
+    margin-bottom: 40px;
+  }
+
+  .title-text {
+    font-size: 40px;
+  }
+
+  .drop-zone-container {
+    width: 88vw;
+    min-width: unset;
+    height: 165px;
+    border-radius: 16px;
+  }
+
+  .primary-msg {
+    font-size: 12px;
+  }
+
+  .secondary-msg {
+    font-size: 10px;
+  }
+}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adversarial Typography</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- Full Viewport 1px Border Frame with Soft Lavender Tint -->
+    <div class="viewport-frame" aria-hidden="true"></div>
+
+    <!-- Ambient Lavender Glows Spanning the Viewport Canvas -->
+    <div class="ambient-glow-title" aria-hidden="true"></div>
+    <div class="ambient-glow-upload" aria-hidden="true"></div>
+
+    <!-- Viewport-Wide Decorative SVG Layer -->
+    <svg class="viewport-decorations" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true">
+      <!-- Top-Left Topographic Contour Lines -->
+      <g stroke="#D8C9FF" stroke-width="1" fill="none" opacity="0.65">
+        <path d="M-60,20 Q200,40 380,240 T600,680" />
+        <path d="M-60,60 Q230,80 410,280 T640,730" />
+        <path d="M-60,100 Q260,120 440,320 T680,780" />
+        <path d="M-60,140 Q290,160 470,360 T720,830" />
+        <path d="M-60,180 Q320,200 500,400 T760,880" />
+        <path d="M-60,220 Q350,240 530,440 T800,930" />
+      </g>
+
+      <!-- Bottom-Right Topographic Contour Lines -->
+      <g stroke="#D8C9FF" stroke-width="1" fill="none" opacity="0.65">
+        <path d="M1500,880 Q1250,860 1070,660 T850,220" />
+        <path d="M1500,840 Q1220,820 1040,620 T810,170" />
+        <path d="M1500,800 Q1190,780 1010,580 T770,120" />
+        <path d="M1500,760 Q1160,740 980,540 T730,70" />
+        <path d="M1500,720 Q1130,700 950,500 T690,20" />
+        <path d="M1500,680 Q1100,660 920,460 T650,-30" />
+      </g>
+
+      <!-- Top-Right Viewport Corner Dot Grid & Blueprint Line -->
+      <g opacity="0.75">
+        <pattern id="dot-grid-tr" width="18" height="18" patternUnits="userSpaceOnUse">
+          <circle cx="3" cy="3" r="1.3" fill="#A78BFA" />
+        </pattern>
+        <rect x="1310" y="35" width="90" height="90" fill="url(#dot-grid-tr)" opacity="0.6" />
+
+        <!-- Hairline Blueprint Line -->
+        <path d="M1355,45 L1355,240 L1335,290 L1355,340 L1355,580" stroke="#D8C9FF" stroke-width="1" fill="none" opacity="0.75" />
+        
+        <!-- Glowing Purple Node -->
+        <circle cx="1355" cy="110" r="4" fill="#8B5CF6" />
+        <circle cx="1355" cy="110" r="10" fill="#A78BFA" opacity="0.3" />
+      </g>
+
+      <!-- Bottom-Left Viewport Corner Dot Grid & Blueprint Line -->
+      <g opacity="0.75">
+        <pattern id="dot-grid-bl" width="18" height="18" patternUnits="userSpaceOnUse">
+          <circle cx="3" cy="3" r="1.3" fill="#A78BFA" />
+        </pattern>
+        <rect x="35" y="775" width="90" height="90" fill="url(#dot-grid-bl)" opacity="0.6" />
+
+        <!-- Hairline Blueprint Line -->
+        <path d="M80,855 L80,660 L60,610 L80,560 L80,320" stroke="#D8C9FF" stroke-width="1" fill="none" opacity="0.75" />
+
+        <!-- Glowing Purple Node -->
+        <circle cx="80" cy="790" r="4" fill="#8B5CF6" />
+        <circle cx="80" cy="790" r="10" fill="#A78BFA" opacity="0.3" />
+      </g>
+    </svg>
+
+    <!-- Main Full-Screen Native Application Layout -->
+    <main class="app-layout">
+      <!-- Title Section (~20% top offset) -->
+      <div class="title-section">
+        <h1 class="title-text">Adversarial Typography</h1>
+      </div>
+
+      <!-- Upload Drop Zone Container (~40% viewport width) -->
+      <div class="drop-zone-container" id="dropZone">
+        <div class="drop-zone-border">
+          <input type="file" id="fileInput" accept=".pdf" hidden />
+          
+          <div class="drop-zone-default" id="dropZoneDefault">
+            <div class="icon-circle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <p class="primary-msg">Drop a resume PDF, or click to choose one</p>
+            <p class="secondary-msg">No file leaves this preview &ndash; sample scan only</p>
+          </div>
+
+          <!-- File Selected View -->
+          <div class="file-selected-view" id="fileSelectedView" style="display: none;">
+            <div class="selected-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <div class="file-info">
+              <p class="file-name" id="fileName"></p>
+              <p class="file-size" id="fileSize"></p>
+            </div>
+            <button type="button" class="reset-btn" id="resetBtn">Change File</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
