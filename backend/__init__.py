@@ -1,1 +1,1 @@
-
+"""Adversarial Typography backend package."""

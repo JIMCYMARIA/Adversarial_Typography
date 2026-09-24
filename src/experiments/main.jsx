@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './style.css';
+import { API_BASE, apiUrl } from '../../api.js';
 
-const API = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 const scenarios = [
   ['CLEAN RESUME','Clean Resume'], ['MICRO-TEXT','Micro Typography'], ['WHITE-ON-WHITE','White-on-White'],
   ['LOW-CONTRAST','Low Contrast'], ['TRANSPARENT TEXT','Transparent Text'], ['OFF-CANVAS','Off-Canvas'],
@@ -38,10 +38,10 @@ function ExperimentPage() {
   async function run(e) {
     e.preventDefault();setBusy(true);setStatus('Generating paired documents and running all detector modes…');setResult(null);
     try {
-      const response=await fetch(`${API}/api/run-experiment`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenario,samples:Number(samples),font_size:Number(fontSize),text_color:rgb(textColor),background_color:withBackground?rgb(backgroundColor):null,position,payload})});
+      const response=await fetch(apiUrl('/api/run-experiment'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenario,samples:Number(samples),font_size:Number(fontSize),text_color:rgb(textColor),background_color:withBackground?rgb(backgroundColor):null,position,payload})});
       const data=await response.json();if(!response.ok)throw new Error(data.detail||'Experiment failed');
       setResult(data);setStatus(`${data.sample_count} generated documents evaluated.`);
-    } catch(error) { setStatus(`${error.message}. Confirm the API is running at ${API}.`); }
+    } catch(error) { setStatus(`${error.message}. Confirm the API is reachable${API_BASE ? ` at ${API_BASE}` : ''}.`); }
     finally {setBusy(false);}
   }
 

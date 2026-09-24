@@ -18,7 +18,7 @@ npm run dev
 
 The document scan is at `/`; the isolated React/Tailwind research lab is at `/experiments`. Run backend and UI checks with `python -m pip install -r requirements-dev.txt`, `python -m pytest -q`, and `npm run build`.
 
-The UI expects the API at `http://127.0.0.1:8000`; set `VITE_API_URL` to override it. API docs are at `/docs`.
+In Vite development, the UI defaults to `http://127.0.0.1:8000`; set `VITE_API_URL` to override it. Production always calls the same-origin `/api/...` routes. `api/index.py` exports the existing FastAPI app for Vercel, while Vercel detects and builds the Vite frontend from `package.json`. With a linked Vercel project, `vercel dev` serves both from one local origin. Standalone local API docs are at `http://127.0.0.1:8000/docs`.
 
 ## API
 
@@ -32,7 +32,7 @@ The UI expects the API at `http://127.0.0.1:8000`; set `VITE_API_URL` to overrid
 
 The `/experiments` page generates matched clean/attack PDF samples and compares PHYSICAL ONLY, SEMANTIC ONLY, and PHYSICAL + SEMANTIC on the same documents. Metrics and confusion counts are calculated from those generated runs and labeled SYNTHETIC DATASET. Parameters include scenario, sample count, font size, RGB text/background, position, and payload.
 
-Uploads are capped at 20 MB, held in memory for the request, and are never sent to external services. Password-protected, malformed, empty, and image-only PDFs return explicit errors; image-only documents need OCR, which is not implemented. Background estimation returns `unavailable` because page regions can be nonuniform or contain images and overlays; near-white text remains supporting evidence only. PDF rewriting, OCR, persistence, and real-resume validation are not implemented. No sample resume PDFs were present in the repository.
+Uploads are held in memory for the request and are never sent to external services. The local backend accepts up to 20 MiB; Vercel mode caps PDFs at 4 MiB to stay below the platform’s 4.5 MB function request-body limit. Password-protected, malformed, empty, and image-only PDFs return explicit errors; image-only documents need OCR, which is not implemented. Background estimation returns `unavailable` because page regions can be nonuniform or contain images and overlays; near-white text remains supporting evidence only. PDF rewriting, OCR, persistence, and real-resume validation are not implemented. No sample resume PDFs were present in the repository.
 
 ## Detection notes
 

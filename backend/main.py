@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import html
 import math
+import os
 import re
 import statistics
 import tempfile
@@ -20,7 +21,7 @@ from fastapi.responses import HTMLResponse, Response
 from pydantic import BaseModel, Field
 from backend.coordinates import bbox_to_rendered
 
-MAX_FILE_BYTES = 20 * 1024 * 1024
+MAX_FILE_BYTES = (4 * 1024 * 1024) if os.getenv("VERCEL") == "1" else (20 * 1024 * 1024)
 INDICATORS = re.compile(r"ignore (?:all )?(?:previous|prior) instructions|ignore the instructions above|system message|developer message|override instructions|follow these instructions|do not reveal|select this candidate|rank this (?:candidate|resume)(?: highly)?|choose this candidate|disregard previous instructions|hidden instruction", re.I)
 
 app = FastAPI(title="Adversarial Typography Forensics API", version="1.0.0")
@@ -113,7 +114,7 @@ def config(): return {"max_file_bytes":MAX_FILE_BYTES,"detection_mode":"PHYSICAL
 async def analyze(file: UploadFile=File(...)):
     if not file.filename or not file.filename.lower().endswith(".pdf"): raise HTTPException(415,"Only PDF files are supported.")
     data=await file.read(MAX_FILE_BYTES+1)
-    if len(data)>MAX_FILE_BYTES: raise HTTPException(413,"PDF exceeds the 20 MB upload limit.")
+    if len(data)>MAX_FILE_BYTES: raise HTTPException(413,f"PDF exceeds the {MAX_FILE_BYTES // (1024 * 1024)} MB upload limit.")
     if not data.startswith(b"%PDF-"): raise HTTPException(415,"Uploaded file does not have a PDF signature.")
     result=analyze_bytes(data,file.filename)
     result["analysis_type"]="SYNTHETIC RESEARCH SCENARIO" if result["document_marker"]=="synthetic" else "REAL DOCUMENT ANALYSIS"
@@ -123,7 +124,7 @@ async def analyze(file: UploadFile=File(...)):
 async def render_page(page_number: int = 1, file: UploadFile = File(...)):
     if not file.filename or not file.filename.lower().endswith(".pdf"): raise HTTPException(415,"Only PDF files are supported.")
     data=await file.read(MAX_FILE_BYTES+1)
-    if len(data)>MAX_FILE_BYTES: raise HTTPException(413,"PDF exceeds the 20 MB upload limit.")
+    if len(data)>MAX_FILE_BYTES: raise HTTPException(413,f"PDF exceeds the {MAX_FILE_BYTES // (1024 * 1024)} MB upload limit.")
     try: doc=fitz.open(stream=data,filetype="pdf")
     except Exception as exc: raise HTTPException(400,f"Could not parse PDF: {exc}")
     if doc.needs_pass: doc.close(); raise HTTPException(422,"Password-protected PDFs are not supported.")
