@@ -1,5 +1,9 @@
 # Dependencies
 node_modules/
+.npm-cache/
+__pycache__/
+*.py[cod]
+.pytest_cache/
 .pnp
 .pnp.js
 

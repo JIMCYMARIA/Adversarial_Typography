@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Adversarial Typography</title>
+    <title>Adversarial Typography — PDF Forensics</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,6 +12,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./site.css" />
   </head>
   <body>
     <!-- Full Viewport 1px Border Frame with Soft Lavender Tint -->
@@ -24,7 +25,7 @@
     <!-- Viewport-Wide Decorative SVG Layer -->
     <svg class="viewport-decorations" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true">
       <!-- Top-Left Topographic Contour Lines -->
-      <g stroke="#D8C9FF" stroke-width="1" fill="none" opacity="0.65">
+      <g stroke="#FCA5A5" stroke-width="1" fill="none" opacity="0.65">
         <path d="M-60,20 Q200,40 380,240 T600,680" />
         <path d="M-60,60 Q230,80 410,280 T640,730" />
         <path d="M-60,100 Q260,120 440,320 T680,780" />
@@ -34,7 +35,7 @@
       </g>
 
       <!-- Bottom-Right Topographic Contour Lines -->
-      <g stroke="#D8C9FF" stroke-width="1" fill="none" opacity="0.65">
+      <g stroke="#FCA5A5" stroke-width="1" fill="none" opacity="0.65">
         <path d="M1500,880 Q1250,860 1070,660 T850,220" />
         <path d="M1500,840 Q1220,820 1040,620 T810,170" />
         <path d="M1500,800 Q1190,780 1010,580 T770,120" />
@@ -46,39 +47,43 @@
       <!-- Top-Right Viewport Corner Dot Grid & Blueprint Line -->
       <g opacity="0.75">
         <pattern id="dot-grid-tr" width="18" height="18" patternUnits="userSpaceOnUse">
-          <circle cx="3" cy="3" r="1.3" fill="#A78BFA" />
+          <circle cx="3" cy="3" r="1.3" fill="#F87171" />
         </pattern>
         <rect x="1310" y="35" width="90" height="90" fill="url(#dot-grid-tr)" opacity="0.6" />
 
         <!-- Hairline Blueprint Line -->
-        <path d="M1355,45 L1355,240 L1335,290 L1355,340 L1355,580" stroke="#D8C9FF" stroke-width="1" fill="none" opacity="0.75" />
+        <path d="M1355,45 L1355,240 L1335,290 L1355,340 L1355,580" stroke="#FCA5A5" stroke-width="1" fill="none" opacity="0.75" />
         
-        <!-- Glowing Purple Node -->
-        <circle cx="1355" cy="110" r="4" fill="#8B5CF6" />
-        <circle cx="1355" cy="110" r="10" fill="#A78BFA" opacity="0.3" />
+        <!-- Glowing Red Node -->
+        <circle cx="1355" cy="110" r="4" fill="#EF4444" />
+        <circle cx="1355" cy="110" r="10" fill="#FCA5A5" opacity="0.3" />
       </g>
 
       <!-- Bottom-Left Viewport Corner Dot Grid & Blueprint Line -->
       <g opacity="0.75">
         <pattern id="dot-grid-bl" width="18" height="18" patternUnits="userSpaceOnUse">
-          <circle cx="3" cy="3" r="1.3" fill="#A78BFA" />
+          <circle cx="3" cy="3" r="1.3" fill="#F87171" />
         </pattern>
         <rect x="35" y="775" width="90" height="90" fill="url(#dot-grid-bl)" opacity="0.6" />
 
         <!-- Hairline Blueprint Line -->
-        <path d="M80,855 L80,660 L60,610 L80,560 L80,320" stroke="#D8C9FF" stroke-width="1" fill="none" opacity="0.75" />
+        <path d="M80,855 L80,660 L60,610 L80,560 L80,320" stroke="#FCA5A5" stroke-width="1" fill="none" opacity="0.75" />
 
-        <!-- Glowing Purple Node -->
-        <circle cx="80" cy="790" r="4" fill="#8B5CF6" />
-        <circle cx="80" cy="790" r="10" fill="#A78BFA" opacity="0.3" />
+        <!-- Glowing Red Node -->
+        <circle cx="80" cy="790" r="4" fill="#EF4444" />
+        <circle cx="80" cy="790" r="10" fill="#FCA5A5" opacity="0.3" />
       </g>
     </svg>
 
     <!-- Main Full-Screen Native Application Layout -->
     <main class="app-layout">
+      <nav class="top-nav"><a href="/">DOCUMENT SCAN</a><a href="/experiments">RESEARCH EXPERIMENTS</a></nav>
       <!-- Title Section (~20% top offset) -->
       <div class="title-section">
+        <p class="eyebrow">PDF-LEVEL DOCUMENT FORENSICS FIREWALL</p>
         <h1 class="title-text">Adversarial Typography</h1>
+        <p class="subtitle">PDF-Level Detection &amp; Sanitization of Hidden Prompt Injections</p>
+        <p class="supporting">Detect what normal text extraction cannot see.</p>
       </div>
 
       <!-- Upload Drop Zone Container (~40% viewport width) -->
@@ -95,13 +100,13 @@
               </svg>
             </div>
             <p class="primary-msg">Drop a resume PDF, or click to choose one</p>
-            <p class="secondary-msg">No file leaves this preview &ndash; sample scan only</p>
+            <p class="secondary-msg">PDF files up to 20 MB · analyzed locally by the connected API</p>
           </div>
 
           <!-- File Selected View -->
           <div class="file-selected-view" id="fileSelectedView" style="display: none;">
             <div class="selected-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14 2 14 8 20 8"/>
                 <line x1="16" y1="13" x2="8" y2="13"/>
@@ -116,6 +121,9 @@
           </div>
         </div>
       </div>
+      <button type="button" class="scan-btn" id="scanBtn" disabled>SCAN RESUME</button>
+      <div class="scan-status" id="scanStatus" role="status"></div>
+      <section class="results" id="results" hidden></section>
     </main>
 
     <script type="module" src="./main.js"></script>
