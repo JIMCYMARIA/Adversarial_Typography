@@ -5,8 +5,24 @@ import pytest
 from fastapi.testclient import TestClient
 
 from backend.main import app
+from api.index import app as vercel_app
 
 client=TestClient(app)
+
+
+def test_api_index_exposes_same_app():
+    assert vercel_app is app
+
+
+def test_health_and_config_endpoints():
+    res = client.get("/api/health")
+    assert res.status_code == 200
+    assert res.json()["status"] == "online"
+    assert res.json()["engine"] == "PyMuPDF"
+
+    res_cfg = client.get("/api/config")
+    assert res_cfg.status_code == 200
+    assert "max_file_bytes" in res_cfg.json()
 
 
 def test_synthetic_upload_is_never_labeled_as_real():
