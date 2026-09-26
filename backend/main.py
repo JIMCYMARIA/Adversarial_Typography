@@ -25,7 +25,7 @@ MAX_FILE_BYTES = (4 * 1024 * 1024) if os.getenv("VERCEL") == "1" else (20 * 1024
 INDICATORS = re.compile(r"ignore (?:all )?(?:previous|prior) instructions|ignore the instructions above|system message|developer message|override instructions|follow these instructions|do not reveal|select this candidate|rank this (?:candidate|resume)(?: highly)?|choose this candidate|disregard previous instructions|hidden instruction", re.I)
 
 app = FastAPI(title="Adversarial Typography Forensics API", version="1.0.0")
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4173", "http://127.0.0.1:4173"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4173", "http://127.0.0.1:4173"], allow_methods=["*"], allow_headers=["*"], expose_headers=["*"])
 
 class SanitizeRequest(BaseModel):
     analysis: dict[str, Any]
@@ -82,7 +82,14 @@ def analyze_bytes(data: bytes, filename: str, mode: str = "PHYSICAL + SEMANTIC")
     median=statistics.median(sizes); mean=statistics.mean(sizes); findings=[]
     for item in raw:
         types=[]; evidence=[]; rules=[]; size=item["font_size"]; color=item["color"]; box=item["bbox"]; w=item["page_width"]; h=item["page_height"]
-        if mode != "SEMANTIC ONLY" and (size < 2 or (median and size < median*0.25)): types.append("MICRO_TYPOGRAPHY"); rules.append("Micro typography"); evidence.append(f"Font size {size:.2f} pt is below the 2 pt threshold or substantially below document median {median:.2f} pt.")
+        if mode != "SEMANTIC ONLY" and (size <= 2 or (median and size < median*0.25)):
+            types.append("MICRO_TYPOGRAPHY"); rules.append("Micro typography")
+            if abs(size - 2.0) < 0.005:
+                evidence.append(f"Font size {size:.2f} pt is at the 2 pt threshold or substantially below document median {median:.2f} pt.")
+            elif size < 2:
+                evidence.append(f"Font size {size:.2f} pt is at or below the 2 pt threshold or substantially below document median {median:.2f} pt.")
+            else:
+                evidence.append(f"Font size {size:.2f} pt is substantially below document median {median:.2f} pt.")
         # A white or near-white span is only a color clue; without reliable page background no contrast is asserted.
         if mode != "SEMANTIC ONLY" and color and min(color)>238: types.append("COLOR_CAMOUFLAGE"); rules.append("Near-white text color"); evidence.append("Text uses a near-white color; background estimation is unavailable because page regions may contain images, gradients, or nonuniform fills.")
         if mode != "SEMANTIC ONLY" and item["opacity"] is not None and item["opacity"] < 0.5: types.append("TRANSPARENT_TEXT"); rules.append("Low opacity"); evidence.append(f"Text opacity metadata is {item['opacity']:.2f}.")
@@ -141,6 +148,78 @@ def sanitize(req: SanitizeRequest):
         key=(span.get("page"),span.get("block"),span.get("line"),span.get("span")); record={"page":span.get("page"),"text":span.get("text"),"block":span.get("block"),"line":span.get("line"),"span":span.get("span")}; observed.append(record)
         (quarantined if key in keys else kept).append(record)
     return {"label":"SANITIZED SEMANTIC REPRESENTATION","observed_text":observed,"sanitized_text":"\n".join(x["text"] for x in kept),"quarantined_text":quarantined,"limitations":"Quarantine is limited to individual spans that triggered forensic rules. This semantic representation does not modify the source PDF."}
+
+@app.post("/api/sanitize-pdf")
+async def sanitize_pdf(file: UploadFile = File(...)):
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(415, "Only PDF files are supported.")
+    data = await file.read(MAX_FILE_BYTES + 1)
+    if len(data) > MAX_FILE_BYTES:
+        raise HTTPException(413, f"PDF exceeds the {MAX_FILE_BYTES // (1024 * 1024)} MB upload limit.")
+    if not data.startswith(b"%PDF-"):
+        raise HTTPException(415, "Uploaded file does not have a PDF signature.")
+
+    analysis = analyze_bytes(data, file.filename)
+    findings = analysis.get("findings", [])
+
+    try:
+        doc = fitz.open(stream=data, filetype="pdf")
+    except Exception as exc:
+        raise HTTPException(400, f"Could not parse PDF: {exc}")
+    if doc.needs_pass:
+        doc.close()
+        raise HTTPException(422, "Password-protected PDFs are not supported.")
+    if not doc.page_count:
+        doc.close()
+        raise HTTPException(422, "The PDF contains no pages.")
+
+    try:
+        redacted_pages = set()
+        for finding in findings:
+            pno = finding.get("page", 1) - 1
+            if 0 <= pno < doc.page_count:
+                page = doc[pno]
+                bbox = finding.get("bbox", {})
+                if isinstance(bbox, dict):
+                    rect = fitz.Rect(
+                        bbox.get("x", 0),
+                        bbox.get("y", 0),
+                        bbox.get("x", 0) + bbox.get("width", 0),
+                        bbox.get("y", 0) + bbox.get("height", 0),
+                    )
+                elif isinstance(bbox, (list, tuple)) and len(bbox) == 4:
+                    rect = fitz.Rect(bbox)
+                else:
+                    continue
+                if rect.is_valid and not rect.is_empty:
+                    page.add_redact_annot(rect, fill=False, cross_out=False)
+                    redacted_pages.add(pno)
+
+        for pno in redacted_pages:
+            doc[pno].apply_redactions(
+                images=fitz.PDF_REDACT_IMAGE_NONE,
+                graphics=fitz.PDF_REDACT_LINE_ART_NONE,
+                text=fitz.PDF_REDACT_TEXT_REMOVE,
+            )
+
+        sanitized_pdf = doc.tobytes(garbage=4, deflate=True)
+    finally:
+        doc.close()
+
+    stem = Path(file.filename).stem if file.filename else "document"
+    sanitized_filename = f"{stem}-sanitized.pdf"
+
+    return Response(
+        content=sanitized_pdf,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{sanitized_filename}"',
+            "X-Sanitized-Objects": str(len(findings)),
+            "X-Original-Objects": str(analysis.get("objects_analyzed", 0)),
+            "X-Sanitization-Mode": "PHYSICAL-PDF",
+        },
+    )
+
 
 @app.post("/api/generate-test-document")
 def generate_test_document(req: GenerateRequest):
@@ -201,4 +280,4 @@ def audit_report(req: SanitizeRequest):
     source=html.escape(str(a.get("analysis_type","SYNTHETIC RESEARCH SCENARIO" if a.get("document_marker")=="synthetic" else "REAL DOCUMENT ANALYSIS")))
     rows="".join(f"<tr><td>{html.escape(str(f.get('page')))}</td><td>{html.escape(str(f.get('severity')))}</td><td>{html.escape(str(f.get('risk_contribution')))}</td><td>{html.escape(str(f.get('text','')))}</td><td>{html.escape(', '.join(f.get('attack_types',[])))}</td><td>{html.escape('; '.join(f.get('evidence',[])))}</td></tr>" for f in a.get('findings',[]))
     fonts=html.escape(", ".join(f"{font} ({count})" for font,count in baseline.get("common_fonts",[])))
-    return f"<!doctype html><meta charset='utf-8'><title>Forensic Audit — {html.escape(str(a.get('filename','Document')))}</title><style>body{{font:15px system-ui;max-width:1100px;margin:40px auto;background:#0b1220;color:#e5eefb}}table{{width:100%;border-collapse:collapse}}td,th{{padding:10px;border:1px solid #334155;text-align:left;vertical-align:top}}small{{color:#93a4ba}}</style><h1>Adversarial Typography — Forensic Audit</h1><p><strong>{source}</strong></p><h2>{html.escape(str(a.get('filename')))}</h2><p>Pages: {a.get('page_count')} · Objects analyzed: {a.get('objects_analyzed')} · Suspicious objects: {a.get('suspicious_objects')}</p><h2>Risk: {a.get('risk_score')}/100 — {html.escape(str(a.get('risk_level')))}</h2><h3>Document typography baseline</h3><p>Median: {baseline.get('median_font_size')} pt · Minimum: {baseline.get('minimum_font_size')} pt · Maximum: {baseline.get('maximum_font_size')} pt</p><p>Common fonts: {fonts}</p><p>Background estimation: {html.escape(str(background.get('status')))} — {html.escape(str(background.get('reason')))}</p><p>Thresholds: {html.escape(json.dumps(a.get('thresholds',{}),ensure_ascii=False))}</p><p>Detection mode: {html.escape(str(a.get('detection_mode')))}</p><table><tr><th>Page</th><th>Severity</th><th>Risk</th><th>Text</th><th>Evidence types</th><th>Evidence</th></tr>{rows}</table><h3>Sanitization</h3><p>Sanitized semantic representation can quarantine {a.get('suspicious_objects',0)} flagged span(s). The original PDF is not rewritten.</p><h3>Limitations</h3><small>Physical visibility heuristics are evidence, not proof of malicious intent. OCR is not performed. Background and opacity metadata may be unavailable. Semantic sanitization does not rewrite the PDF.</small><p><small>Generated {html.escape(str(a.get('timestamp')))} · {html.escape(str(a.get('detection_mode')))}</small></p>"
+    return f"<!doctype html><meta charset='utf-8'><title>Forensic Audit — {html.escape(str(a.get('filename','Document')))}</title><style>body{{font:15px system-ui;max-width:1100px;margin:40px auto;background:#0b1220;color:#e5eefb}}table{{width:100%;border-collapse:collapse}}td,th{{padding:10px;border:1px solid #334155;text-align:left;vertical-align:top}}small{{color:#93a4ba}}</style><h1>Adversarial Typography — Forensic Audit</h1><p><strong>{source}</strong></p><h2>{html.escape(str(a.get('filename')))}</h2><p>Pages: {a.get('page_count')} · Objects analyzed: {a.get('objects_analyzed')} · Suspicious objects: {a.get('suspicious_objects')}</p><h2>Risk: {a.get('risk_score')}/100 — {html.escape(str(a.get('risk_level')))}</h2><h3>Document typography baseline</h3><p>Median: {baseline.get('median_font_size')} pt · Minimum: {baseline.get('minimum_font_size')} pt · Maximum: {baseline.get('maximum_font_size')} pt</p><p>Common fonts: {fonts}</p><p>Background estimation: {html.escape(str(background.get('status')))} — {html.escape(str(background.get('reason')))}</p><p>Thresholds: {html.escape(json.dumps(a.get('thresholds',{}),ensure_ascii=False))}</p><p>Detection mode: {html.escape(str(a.get('detection_mode')))}</p><table><tr><th>Page</th><th>Severity</th><th>Risk</th><th>Text</th><th>Evidence types</th><th>Evidence</th></tr>{rows}</table><h3>Sanitization</h3><p>Physical PDF sanitization is available. Flagged text spans can be removed from a new sanitized PDF while the uploaded original remains unchanged. Sanitized semantic representation can quarantine {a.get('suspicious_objects',0)} flagged span(s).</p><h3>Limitations</h3><small>Physical visibility heuristics are evidence, not proof of malicious intent. OCR is not performed. Background and opacity metadata may be unavailable. Semantic sanitization does not rewrite the PDF.</small><p><small>Generated {html.escape(str(a.get('timestamp')))} · {html.escape(str(a.get('detection_mode')))}</small></p>"
