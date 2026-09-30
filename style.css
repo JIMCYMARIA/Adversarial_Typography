@@ -309,30 +309,46 @@ body{background-image:linear-gradient(rgba(34,211,238,.025) 1px,transparent 1px)
 /* Animated React Bits background */
 body { background-color: #080d18; background-image: none; }
 .background-root { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: radial-gradient(ellipse at 50% 30%, #142642 0%, #080d18 78%); }
-.background-root::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7, 12, 24, .38), rgba(7, 12, 24, .58)); }
+.background-root::after {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  background:
+    radial-gradient(ellipse 48% 54% at 24% 38%, rgba(24, 182, 255, .34), transparent 76%),
+    radial-gradient(ellipse 50% 62% at 77% 47%, rgba(132, 76, 255, .3), transparent 76%),
+    radial-gradient(ellipse 40% 44% at 52% 83%, rgba(43, 220, 212, .2), transparent 78%);
+  mix-blend-mode: screen;
+  opacity: .85;
+  animation: iridescence-drift 22s ease-in-out infinite alternate;
+}
+@keyframes iridescence-drift {
+  from { transform: translate3d(-2%, -1%, 0) scale(1); filter: hue-rotate(-12deg); }
+  to { transform: translate3d(2%, 1%, 0) scale(1.08); filter: hue-rotate(22deg); }
+}
 .viewport-frame { z-index: 5; }
 .app-layout { position: relative; z-index: 1; }
 
 /* Slightly larger type for easier reading */
 .eyebrow { font-size: 11px; }
-.title-text { font-size: clamp(37px, 5.2vw, 62px); }
-.subtitle { font-size: 15px; }
-.supporting { font-size: 13px; }
-.primary-msg { font-size: 15px; }
-.secondary-msg { font-size: 12px; }
-.scan-btn, .result-actions button, #textBtn, #downloadPdfAgainBtn { font-size: 12px; }
-.scan-status { font-size: 12px; }
-.results h2 { font-size: 12px; }
-.results h3 { font-size: 11px; }
-.note, .finding span, .metrics small, .metrics strong i, .span small, .finding small { font-size: 10px; }
-.span p, .finding strong { font-size: 13px; }
-.page-tag, .count { font-size: 10px; }
-.evidence, .sanitization-details p { font-size: 12px; }
-.sanitized-grid pre, .quarantine { font-size: 11px; }
+.title-text { font-size: clamp(40px, 5.4vw, 66px); }
+.subtitle { font-size: 16px; }
+.supporting { font-size: 14px; }
+.primary-msg { font-size: 16px; }
+.secondary-msg { font-size: 13px; }
+.top-nav { font-size: 10px; }
+.scan-btn, .result-actions button, #textBtn, #downloadPdfAgainBtn { font-size: 13px; }
+.scan-status { font-size: 13px; }
+.results h2 { font-size: 13px; }
+.results h3 { font-size: 12px; }
+.note, .finding span, .metrics small, .metrics strong i, .span small, .finding small { font-size: 11px; }
+.span p, .finding strong { font-size: 14px; }
+.page-tag, .count { font-size: 11px; }
+.evidence, .sanitization-details p { font-size: 13px; }
+.sanitized-grid pre, .quarantine { font-size: 12px; }
 
 @media (max-width: 760px) {
-  .title-text { font-size: clamp(35px, 9vw, 46px); }
-  .subtitle { font-size: 14px; line-height: 1.6; }
-  .primary-msg { font-size: 14px; }
-  .secondary-msg { font-size: 11px; }
+  .title-text { font-size: clamp(37px, 9.5vw, 48px); }
+  .subtitle { font-size: 15px; line-height: 1.6; }
+  .primary-msg { font-size: 15px; }
+  .secondary-msg { font-size: 12px; }
 }

@@ -5,7 +5,7 @@ import Iridescence from './Iridescence.jsx';
 export function mountIridescence(container) {
   if (!container) return;
   createRoot(container).render(createElement(Iridescence, {
-    color: [0.55, 0.72, 1],
+    color: [1, 1, 1],
     mouseReact: false,
     amplitude: 0.1,
     speed: 0.2
