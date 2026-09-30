@@ -1,7 +1,9 @@
 import { API_BASE, apiUrl, MAX_UPLOAD_BYTES } from './api.js';
+import { mountIridescence } from './src/background.js';
 const $ = (id) => document.getElementById(id);
 
 document.addEventListener('DOMContentLoaded', () => {
+  mountIridescence(document.getElementById('background-root'));
   if (location.pathname.replace(/\/$/, '') === '/experiments') {
     import('./src/experiments/main.jsx').then(({ mountExperiments }) => mountExperiments(document.querySelector('.app-layout'))).catch(error => {
       console.error('Could not load research experiments:', error);
