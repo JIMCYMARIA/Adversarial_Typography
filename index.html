@@ -4,33 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Adversarial Typography — PDF Forensics</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@800;900&display=swap"
-      rel="stylesheet"
-    />
     <link rel="stylesheet" href="./style.css" />
     <link rel="stylesheet" href="./site.css" />
   </head>
   <body>
     <div id="background-root" class="background-root" aria-hidden="true"></div>
-    <!-- Full Viewport 1px Border Frame with Soft Lavender Tint -->
-    <div class="viewport-frame" aria-hidden="true"></div>
-<!-- Main Full-Screen Native Application Layout -->
     <main class="app-layout">
-      <nav class="top-nav"><a href="/">DOCUMENT SCAN</a><a href="/experiments">RESEARCH EXPERIMENTS</a></nav>
-      <!-- Title Section (~20% top offset) -->
-      <div class="title-section">
-        <p class="eyebrow">PDF-LEVEL DOCUMENT FORENSICS FIREWALL</p>
-        <h1 class="title-text">Adversarial Typography</h1>
-        <p class="subtitle">PDF-Level Detection &amp; Sanitization of Hidden Prompt Injections</p>
-        <p class="supporting">Detect what normal text extraction cannot see.</p>
-      </div>
+      <section class="hero-shell" aria-labelledby="hero-title">
+        <nav class="top-nav" aria-label="Main navigation"><a href="/" aria-current="page">Document Scan</a><a href="/experiments">Research Experiments</a></nav>
+        <div class="hero-divider" aria-hidden="true"></div>
+        <div class="title-section">
+          <div class="hero-copy">
+            <p class="eyebrow">DOCUMENT SECURITY · RESEARCH PREVIEW</p>
+            <h1 class="title-text" id="hero-title">Adversarial Typography</h1>
+            <p class="subtitle">See what hides in the fine print.</p>
+            <p class="supporting">Inspect PDF typography for hidden instructions, low-visibility text, and unusual placement — with evidence you can review.</p>
+            <div class="hero-actions"><a class="hero-secondary" href="#dropZone">Explore the scanner <span aria-hidden="true">↓</span></a></div>
+          </div>
+          <div class="hero-illustration" aria-hidden="true">
+            <div class="document-art"><div class="document-top"><span class="pdf-mark">PDF</span><span class="doc-check">✓</span></div><div class="document-lines"><i></i><i></i><i></i><i class="detected-line"></i><i></i><i></i><i></i></div><div class="document-footer"><span>TEXT SPAN DETECTED</span><b>PAGE 01</b></div></div>
+            <div class="lens-art"><span class="lens-ring"></span><span class="lens-handle"></span><span class="lens-check">✓</span></div>
+            <span class="illustration-label">PDF forensics</span>
+          </div>
+        </div>
+      </section>
 
-      <!-- Upload Drop Zone Container (~40% viewport width) -->
-      <div class="drop-zone-container" id="dropZone">
+      <section class="scanner-section" aria-labelledby="scanner-title"><div class="scanner-intro"><span class="section-kicker">START AN ANALYSIS</span><h2 id="scanner-title">Bring a document into focus</h2><p>Upload a PDF to inspect its text, visibility, and page-level evidence.</p></div>
+      <div class="drop-zone-container" id="dropZone" role="button" tabindex="0" aria-label="Choose or drop a PDF document">
         <div class="drop-zone-border">
           <input type="file" id="fileInput" accept=".pdf" hidden />
           
@@ -42,8 +42,8 @@
                 <line x1="12" y1="3" x2="12" y2="15"/>
               </svg>
             </div>
-            <p class="primary-msg">Drop a resume PDF, or click to choose one</p>
-            <p class="secondary-msg">PDF files up to 20 MB · analyzed locally by the connected API</p>
+            <p class="primary-msg">Drop your PDF here, or <span>browse files</span></p>
+            <p class="secondary-msg">PDF only · up to 20 MB · file contents are analyzed by the connected API</p>
           </div>
 
           <!-- File Selected View -->
@@ -64,8 +64,9 @@
           </div>
         </div>
       </div>
-      <button type="button" class="scan-btn" id="scanBtn" disabled>SCAN RESUME</button>
+      <button type="button" class="scan-btn" id="scanBtn" disabled>Analyze document <span aria-hidden="true">→</span></button>
       <div class="scan-status" id="scanStatus" role="status"></div>
+      <p class="privacy-note"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2 17 5v5c0 4.3-2.9 7.7-7 9-4.1-1.3-7-4.7-7-9V5l7-3Z"/><path d="m7 10 2 2 4-4"/></svg> Research prototype · Detection signals are evidence for review, not proof of malicious intent.</p></section>
       <section class="results" id="results" hidden></section>
     </main>
 

@@ -46,7 +46,7 @@ function ExperimentPage() {
   }
 
   return <div className="mx-auto w-[min(1100px,94vw)] pb-12 text-slate-200">
-    <nav className="mb-8 flex justify-end gap-6 border-b border-slate-800 pb-4 font-mono text-[10px] tracking-widest"><a className="text-slate-400 hover:text-cyan-300" href="/">DOCUMENT SCAN</a><a className="text-cyan-300" aria-current="page" href="/experiments">RESEARCH EXPERIMENTS</a></nav>
+    <nav aria-label="Main navigation" className="top-nav mb-8 flex justify-end gap-6 border-b border-slate-800 pb-4 font-mono text-[10px] tracking-widest"><a href="/">Document scan</a><a aria-current="page" href="/experiments">Research experiments</a></nav>
     <header className="mb-6"><p className="mb-3 font-mono text-[10px] tracking-[.22em] text-cyan-300">CONTROLLED EVALUATION</p><h1 className="mb-3 text-4xl font-extrabold tracking-tight text-white">Research Experiment Lab</h1><p className="text-sm text-slate-400">Generate PDFs, run matched samples through three detector modes, and inspect the measured outcomes.</p><p className="mt-4 inline-block rounded border border-amber-800 bg-amber-950/40 px-3 py-2 font-mono text-[10px] tracking-wide text-amber-300">SYNTHETIC RESEARCH SCENARIO · NOT REAL-WORLD PERFORMANCE</p></header>
     <form onSubmit={run} className="grid grid-cols-1 gap-4 rounded-xl border border-slate-800 bg-slate-950/80 p-5 md:grid-cols-2 lg:grid-cols-3">
       <Field label="ATTACK TYPE"><select value={scenario} onChange={e=>chooseScenario(e.target.value)} className={control}>{scenarios.map(([v,l])=><option key={v} value={v}>{l}</option>)}</select></Field>

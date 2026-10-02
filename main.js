@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   const zone=$('dropZone'), input=$('fileInput'), scan=$('scanBtn'); let selected=null, latest=null;
   zone.addEventListener('click', e => { if(!e.target.closest('#resetBtn')) input.click(); });
+  zone.addEventListener('keydown', e => { if(e.target===zone && (e.key==='Enter'||e.key===' ')){e.preventDefault();input.click();} });
   input.addEventListener('change', () => input.files?.[0] && choose(input.files[0]));
   for(const name of ['dragenter','dragover','dragleave','drop']) zone.addEventListener(name,e=>{e.preventDefault();e.stopPropagation();});
   zone.addEventListener('dragover',()=>zone.classList.add('drag-active'));
